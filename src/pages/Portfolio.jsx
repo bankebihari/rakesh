@@ -5,48 +5,59 @@ import "./Portfolio.css";
    DEFAULTS  (site / civil engineer)
 ───────────────────────────────────────── */
 const DEFAULT_HERO = {
-  badge: "Open to New Projects",
+  badge: "Open to New Opportunities",
   name: "Rakesh Kumar",
-  role: "Site Engineer",
-  bio: "Experienced site engineer with expertise in civil construction, project management, and structural supervision. Committed to delivering high-quality projects on time and within budget.",
+  role: "Civil Engineer",
+  bio: "Civil Engineer with hands-on experience in AutoCAD designing, Advanced BIM Modeling (Revit Architecture & Structure), and Site Supervision. Seeking a challenging platform to contribute skills and drive company growth.",
   imageUrl: "https://cdn-icons-png.flaticon.com/512/1570/1570885.png",
-  linkedinUrl: "https://www.linkedin.com/",
-  contactEmail: "rakesh@email.com",
-  location: "India",
-  footerText: "Portfolio of Rakesh Kumar – Site Engineer",
+  linkedinUrl: "https://www.linkedin.com/in/rakeshkumar-0b4467322",
+  contactEmail: "rakeshkumardangi@gmail.com",
+  location: "Sector 66, Gurugram, Haryana – 122201",
+  footerText: "Portfolio of Rakesh Kumar – Civil Engineer",
 };
 
 const DEFAULT_SKILLS = [
-  "AutoCAD", "MS Project", "Primavera P6", "Structural Analysis",
-  "Concrete Technology", "Steel Structures", "Site Supervision",
-  "Quality Control & QA", "Civil Construction", "Surveying",
-  "Tendering & BOQ", "Project Management", "RCC Design",
-  "Plumbing & Sanitation", "Waterproofing", "Safety Management",
+  // Tech Skills
+  "Auto CAD", "Revit Architecture", "Advance Excel", "Etabs", "QGIS", "Google Earth Pro",
+  // Other Skills
+  "Total Station Operation",
+  // Soft Skills
+  "Collaborative Teamwork", "Time Management", "Leadership",
+  "Effective Communication", "Critical Thinking", "Construction Knowledge",
+  // Languages
+  "Hindi", "English",
 ];
 
 const DEFAULT_EXPERIENCES = [
-  { id: 1, role: "Site Engineer", company: "ABC Construction Pvt. Ltd.", duration: "Jan 2022 – Present", description: "Supervise day-to-day construction activities for residential and commercial projects. Coordinate with contractors, ensure quality standards, and maintain project timelines." },
-  { id: 2, role: "Junior Site Engineer", company: "XYZ Builders", duration: "Jun 2019 – Dec 2021", description: "Assisted in supervision of G+4 residential buildings. Prepared daily progress reports and managed labor and material procurement." },
+  { id: 1, role: "Site Incharge", company: "Construction Site (On-Site)", duration: "1 Year", description: "Working as Site Incharge overseeing day-to-day construction activities, coordinating with contractors, managing labour, and ensuring quality and safety standards on site." },
+  { id: 2, role: "AutoCAD Designer (Campus)", company: "Motihari College of Engineering", duration: "2 Years (2021 – 2023)", description: "2 years on-campus work experience in AutoCAD designing – 2D Drafting and 3D Modeling for civil engineering projects." },
+  { id: 3, role: "BIM Modeler", company: "Motihari College of Engineering", duration: "2021 – 2025", description: "Advanced BIM Modeling in Revit Architecture and Revit Structure – 3D Drafting, Parametric Families, Sections, and Plans for building design and documentation." },
 ];
 
 const DEFAULT_PROJECTS = [
-  { id: 1, name: "Greenview Residency", location: "Mumbai", type: "Residential", budget: "₹3.2 Cr", duration: "20 months", description: "G+7 residential complex with 48 units. Supervised RCC work, finishing, and MEP coordination.", tags: ["RCC", "Residential", "G+7"] },
-  { id: 2, name: "City Mall Expansion", location: "Pune", type: "Commercial", budget: "₹8.5 Cr", duration: "14 months", description: "Structural extension of existing mall. Managed steel erection, slab casting, and facade work.", tags: ["Commercial", "Steel Structure", "Facade"] },
-  { id: 3, name: "Highway Culvert", location: "Nashik", type: "Infrastructure", budget: "₹1.1 Cr", duration: "6 months", description: "Box culvert construction for highway drainage. Managed excavation, formwork, and concrete pouring.", tags: ["Infrastructure", "Culvert", "Highway"] },
+  { id: 1, name: "On-Site Internship Project", location: "India", type: "On-Site", budget: "", duration: "2 Months", description: "Successfully completed a 2-month on-site internship program involving hands-on construction supervision, site management, and field execution tasks.", tags: ["Site Work", "Internship", "Construction"] },
 ];
 
 const DEFAULT_CERTS = [
-  { id: 1, name: "Bachelor of Civil Engineering (B.E.)", issuer: "University of Mumbai", year: "2019" },
-  { id: 2, name: "AutoCAD Certified Professional", issuer: "Autodesk", year: "2020" },
+  // Education
+  { id: 1, name: "B.Tech – Civil Engineering", issuer: "Motihari College of Engineering (Govt.) | Bihar Engineering University, Patna", year: "2021–2025" },
+  { id: 2, name: "Intermediate (12th)", issuer: "Bihar National Collegiate School, Patna", year: "2018–2020" },
+  { id: 3, name: "Matriculation (10th)", issuer: "Anugrah Narayan High School Madanpur, Aurangabad", year: "2017–2018" },
+  // Training & Certifications
+  { id: 4, name: "Revit Architecture Training", issuer: "Training Institute", year: "Jan – Feb 2023" },
+  { id: 5, name: "Etabs Internship Program", issuer: "Training Institute", year: "Mar – Jun 2024" },
+  { id: 6, name: "Advance Excel with Data Visualization", issuer: "Training Institute", year: "Dec 2024 – Feb 2025" },
+  { id: 7, name: "C Programming", issuer: "IIT Bombay", year: "" },
+  { id: 8, name: "Total Station Operation", issuer: "Induction Program (8 weeks)", year: "" },
 ];
 
 const DEFAULT_ABOUT = [
-  { icon: "🏗️", text: "Specialized in <strong>RCC structures</strong> and <strong>commercial construction</strong>" },
-  { icon: "📐", text: "Proficient in <strong>AutoCAD</strong> and <strong>MS Project</strong> planning" },
-  { icon: "🤝", text: "Open to collaborate on <strong>large-scale civil projects</strong>" },
-  { icon: "📍", text: "Based in <strong>India</strong> – available for on-site roles" },
-  { icon: "📫", text: 'Reach me at <a href="mailto:rakesh@email.com" class="readme-email">rakesh@email.com</a>' },
-  { icon: "⚡", text: "Fun fact: I can read a blueprint faster than most people read a menu 😄" },
+  { icon: "🏗️", text: "1 year experience as <strong>Site Incharge</strong> in civil construction" },
+  { icon: "📐", text: "2 years experience in <strong>AutoCAD 2D Drafting &amp; 3D Modeling</strong>" },
+  { icon: "🏢", text: "Advanced <strong>BIM Modeling</strong> – Revit Architecture &amp; Revit Structure" },
+  { icon: "📊", text: "Trained in <strong>Etabs, QGIS, Google Earth Pro</strong> &amp; Advance Excel" },
+  { icon: "📍", text: "Based in <strong>Gurugram, Haryana</strong> – open to on-site roles" },
+  { icon: "📫", text: 'Reach me at <a href="mailto:rakeshkumardangi@gmail.com" class="readme-email">rakeshkumardangi@gmail.com</a>' },
 ];
 
 const SKILL_COLORS = [
@@ -79,7 +90,7 @@ function AuthModal({ onConfirm, onCancel }) {
     e.preventDefault();
     setLoading(true); setErr("");
     try {
-      const res  = await fetch("/api/auth", {
+      const res  = await fetch("/api/se-auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: uid, password: pwd }),
@@ -158,7 +169,7 @@ function CredentialsModal({ onClose }) {
     e.preventDefault();
     setLoading(true); setMsg("");
     try {
-      const res  = await fetch("/api/auth", {
+      const res  = await fetch("/api/se-auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: curId, password: curPass, action: "update", newId, newPass }),
@@ -211,7 +222,7 @@ export default function Portfolio() {
 
   /* ── DB sync ── */
   const saveToDb = (patch) => {
-    fetch("/api/portfolio", {
+    fetch("/api/se-portfolio", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patch),
@@ -330,7 +341,7 @@ export default function Portfolio() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    fetch("/api/resume-meta")
+    fetch("/api/se-resume-meta")
       .then((r) => r.ok ? r.json() : null)
       .then((d) => { if (d?.url) setResume(d); })
       .catch(() => {});
@@ -341,7 +352,7 @@ export default function Portfolio() {
     if (!file) return;
     setUploading(true); setUploadError("");
     try {
-      const res = await fetch("/api/upload-resume", {
+      const res = await fetch("/api/se-upload-resume", {
         method: "PUT",
         headers: { "x-filename": file.name, "content-type": file.type },
         body: file,
@@ -359,16 +370,16 @@ export default function Portfolio() {
 
   const downloadResume = () => {
     const a = document.createElement("a");
-    a.href = "/api/resume-file"; a.download = resume?.name || "resume.pdf";
+    a.href = "/api/se-resume-file"; a.download = resume?.name || "resume.pdf";
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   };
   const deleteResume = () => requireAuth(async () => {
-    await fetch("/api/upload-resume", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: resume?.url }) }).catch(() => {});
+    await fetch("/api/se-upload-resume", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: resume?.url }) }).catch(() => {});
     setResume(null);
   });
 
   /* ── Phone ── */
-  const [phone,        setPhone]        = useState("+91 00000 00000");
+  const [phone,        setPhone]        = useState("+91 8797188875");
   const [editingPhone, setEditingPhone] = useState(false);
   const [phoneInput,   setPhoneInput]   = useState("");
   const phoneRef = useRef(null);
@@ -378,7 +389,7 @@ export default function Portfolio() {
 
   /* ── Load from MongoDB on mount ── */
   useEffect(() => {
-    fetch("/api/portfolio")
+    fetch("/api/se-portfolio")
       .then((r) => r.ok ? r.json() : null)
       .then((d) => {
         if (!d) return;
@@ -403,7 +414,7 @@ export default function Portfolio() {
     e.preventDefault();
     setContactSending(true); setContactError("");
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch("/api/se-contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contactForm),
@@ -469,7 +480,7 @@ export default function Portfolio() {
               )}
             </div>
             <div className="hero-socials">
-              {hero.linkedinUrl && hero.linkedinUrl !== "https://www.linkedin.com/" && (
+              {hero.linkedinUrl && hero.linkedinUrl && hero.linkedinUrl.length > 25 && (
                 <a href={hero.linkedinUrl} target="_blank" rel="noreferrer" className="social-chip">LinkedIn</a>
               )}
               <a href={`mailto:${hero.contactEmail}`} className="social-chip">Email</a>
@@ -724,7 +735,7 @@ export default function Portfolio() {
                 <span className="contact-icon">📧</span>
                 <div><strong>Email</strong><p>{hero.contactEmail}</p></div>
               </a>
-              {hero.linkedinUrl && hero.linkedinUrl !== "https://www.linkedin.com/" && (
+              {hero.linkedinUrl && hero.linkedinUrl && hero.linkedinUrl.length > 25 && (
                 <a href={hero.linkedinUrl} target="_blank" rel="noreferrer" className="contact-card glass">
                   <span className="contact-icon">💼</span>
                   <div><strong>LinkedIn</strong><p>{hero.linkedinUrl.replace("https://", "")}</p></div>
