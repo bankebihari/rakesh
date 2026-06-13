@@ -6,14 +6,14 @@ import "./Portfolio.css";
 ───────────────────────────────────────── */
 const DEFAULT_HERO = {
   badge: "Open to New Projects",
-  name: "Rakesh",
+  name: "Rakesh Kumar",
   role: "Site Engineer",
   bio: "Experienced site engineer with expertise in civil construction, project management, and structural supervision. Committed to delivering high-quality projects on time and within budget.",
   imageUrl: "https://cdn-icons-png.flaticon.com/512/1570/1570885.png",
   linkedinUrl: "https://www.linkedin.com/",
   contactEmail: "rakesh@email.com",
   location: "India",
-  footerText: "Portfolio of Rakesh – Site Engineer",
+  footerText: "Portfolio of Rakesh Kumar – Site Engineer",
 };
 
 const DEFAULT_SKILLS = [
@@ -124,8 +124,8 @@ function HeroEditModal({ hero, onSave, onCancel }) {
         <h3 className="auth-title">✎ Edit Site Content</h3>
         <p className="auth-sub" style={{ marginBottom: "1rem" }}>All changes save to database</p>
         <div className="form-grid">
-          <input className="text-input" placeholder="Badge (e.g. Open to New Projects)" value={form.badge}        onChange={f("badge")} />
-          <input className="text-input" placeholder="Your Name"                          value={form.name}         onChange={f("name")} />
+          <input className="text-input" placeholder="Badge (e.g. Open to New Projects)"  value={form.badge}        onChange={f("badge")} />
+          <input className="text-input" placeholder="Full Name"                          value={form.name}         onChange={f("name")} />
           <input className="text-input" placeholder="Title / Role (e.g. Site Engineer)"  value={form.role}         onChange={f("role")} />
           <textarea className="text-input text-area" placeholder="Bio / Intro paragraph" value={form.bio}          onChange={f("bio")} />
           <input className="text-input" placeholder="Profile Image URL"                  value={form.imageUrl}     onChange={f("imageUrl")} />
@@ -460,7 +460,7 @@ export default function Portfolio() {
             <p className="hero-bio">{hero.bio}</p>
             <div className="hero-location">📍 {hero.location}</div>
             <div className="hero-btns">
-              <a href="#projects" className="btn btn-primary">View My Projects</a>
+              <a href="#projects" className="btn btn-primary">View My Work</a>
               <a href="#contact"  className="btn btn-outline">Contact Me</a>
               {resume && <button className="btn btn-ghost" onClick={downloadResume}>⬇ Resume</button>}
               {!isAdmin && (
@@ -469,7 +469,9 @@ export default function Portfolio() {
               )}
             </div>
             <div className="hero-socials">
-              <a href={hero.linkedinUrl} target="_blank" rel="noreferrer" className="social-chip">LinkedIn</a>
+              {hero.linkedinUrl && hero.linkedinUrl !== "https://www.linkedin.com/" && (
+                <a href={hero.linkedinUrl} target="_blank" rel="noreferrer" className="social-chip">LinkedIn</a>
+              )}
               <a href={`mailto:${hero.contactEmail}`} className="social-chip">Email</a>
             </div>
           </div>
@@ -722,10 +724,12 @@ export default function Portfolio() {
                 <span className="contact-icon">📧</span>
                 <div><strong>Email</strong><p>{hero.contactEmail}</p></div>
               </a>
-              <a href={hero.linkedinUrl} target="_blank" rel="noreferrer" className="contact-card glass">
-                <span className="contact-icon">💼</span>
-                <div><strong>LinkedIn</strong><p>{hero.linkedinUrl.replace("https://", "")}</p></div>
-              </a>
+              {hero.linkedinUrl && hero.linkedinUrl !== "https://www.linkedin.com/" && (
+                <a href={hero.linkedinUrl} target="_blank" rel="noreferrer" className="contact-card glass">
+                  <span className="contact-icon">💼</span>
+                  <div><strong>LinkedIn</strong><p>{hero.linkedinUrl.replace("https://", "")}</p></div>
+                </a>
+              )}
               <div className="contact-card glass">
                 <span className="contact-icon">📍</span>
                 <div><strong>Location</strong><p>{hero.location}</p></div>
