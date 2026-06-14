@@ -6,7 +6,7 @@ let cachedClient = null;
 
 async function getDb() {
   if (cachedClient) return cachedClient.db("rakesh");
-  const client = new MongoClient(uri);
+  const client = new MongoClient(uri, { tls: true, tlsAllowInvalidCertificates: true });
   await client.connect();
   cachedClient = client;
   return client.db("rakesh");
@@ -63,6 +63,6 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ ok: true });
   } catch (e) {
-    return res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: e.message, stack: e.stack?.split('\n')[0] });
   }
 }
