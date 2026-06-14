@@ -39,6 +39,7 @@ export default async function handler(req, res) {
       await put(KEY, JSON.stringify({ id: newId.trim(), password: newPass.trim() }), {
         access: "public",
         addRandomSuffix: false,
+      allowOverwrite: true,
         token: TOKEN,
         contentType: "application/json",
       });

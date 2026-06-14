@@ -14,6 +14,7 @@ async function writeData(data) {
   await put(KEY, JSON.stringify(data), {
     access: "public",
     addRandomSuffix: false,
+      allowOverwrite: true,
     token: TOKEN,
     contentType: "application/json",
   });

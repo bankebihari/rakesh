@@ -39,6 +39,7 @@ export default async function handler(req, res) {
       await put(DATA_KEY, JSON.stringify({ ...existing, resume: meta }), {
         access: "public",
         addRandomSuffix: false,
+      allowOverwrite: true,
         token: TOKEN,
         contentType: "application/json",
       });
@@ -54,6 +55,7 @@ export default async function handler(req, res) {
       await put(DATA_KEY, JSON.stringify(existing), {
         access: "public",
         addRandomSuffix: false,
+      allowOverwrite: true,
         token: TOKEN,
         contentType: "application/json",
       });
