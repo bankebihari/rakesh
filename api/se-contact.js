@@ -1,5 +1,7 @@
 import { MongoClient } from "mongodb";
 import { Resend } from "resend";
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
 
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
