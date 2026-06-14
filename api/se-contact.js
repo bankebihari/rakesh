@@ -27,12 +27,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Name, email and message are required." });
     }
 
-    // 1. Save to MongoDB
-    const db = await getDb();
-    await db.collection("messages").insertOne({
-      name, email, subject, message,
-      receivedAt: new Date(),
-    });
+    // 1. Save to MongoDB (optional - don't fail if DB is down)
+    try {
+      const db = await getDb();
+      await db.collection("messages").insertOne({
+        name, email, subject, message,
+        receivedAt: new Date(),
+      });
+    } catch (dbErr) {
+      console.error("MongoDB error (non-fatal):", dbErr.message);
+    }
 
     // 2. Send email to Rakesh via Resend
     const resend = new Resend(process.env.RESEND_API_KEY);
