@@ -65,7 +65,7 @@ export default async function handler(req, res) {
       </div>
     `;
 
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: "Portfolio Contact <onboarding@resend.dev>",
       to: ["rakeshkumardangi@gmail.com", "bankebihari1206@gmail.com"],
       reply_to: email,
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
       html: emailHtml,
     });
 
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, resend: result });
   } catch (e) {
     return res.status(500).json({ error: e.message, stack: e.stack?.split('\n')[0] });
   }
