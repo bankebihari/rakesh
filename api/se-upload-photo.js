@@ -1,21 +1,19 @@
-import { put } from "@vercel/blob";
-import { MongoClient } from "mongodb";
-import dns from "dns";
-dns.setDefaultResultOrder("ipv4first");
+import { put, list } from "@vercel/blob";
 
-const uri = process.env.MONGODB_URI;
-let cachedClient = null;
-
-async function getDb() {
-  if (cachedClient) return cachedClient.db("rakesh");
-  const client = new MongoClient(uri, { tls: true, tlsAllowInvalidCertificates: true });
-  await client.connect();
-  cachedClient = client;
-  return client.db("rakesh");
-}
-
+const TOKEN        = process.env.BLOB_READ_WRITE_TOKEN;
 const DEFAULT_ID   = "rakesh2025";
 const DEFAULT_PASS = "Bablu@1234";
+
+async function getCreds() {
+  try {
+    const { blobs } = await list({ prefix: "portfolio-data/admin", token: TOKEN });
+    if (!blobs.length) return { id: DEFAULT_ID, password: DEFAULT_PASS };
+    const r = await fetch(blobs[0].url);
+    return r.ok ? r.json() : { id: DEFAULT_ID, password: DEFAULT_PASS };
+  } catch {
+    return { id: DEFAULT_ID, password: DEFAULT_PASS };
+  }
+}
 
 export const config = { api: { bodyParser: false } };
 
@@ -28,38 +26,19 @@ export default async function handler(req, res) {
   if (req.method !== "PUT") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    // Verify credentials from headers
     const adminId   = req.headers["x-admin-id"]   || "";
     const adminPass = req.headers["x-admin-pass"]  || "";
+    const creds     = await getCreds();
 
-    let storedId   = DEFAULT_ID;
-    let storedPass = DEFAULT_PASS;
-
-    try {
-      const db  = await getDb();
-      const doc = await db.collection("config").findOne({ _id: "admin" });
-      if (doc) { storedId = doc.id; storedPass = doc.password; }
-    } catch (_) {}
-
-    if (adminId !== storedId || adminPass !== storedPass) {
+    if (adminId !== creds.id || adminPass !== creds.password) {
       return res.status(401).json({ error: "Invalid credentials." });
     }
 
     const filename = req.headers["x-filename"] || `photo-${Date.now()}.jpg`;
     const blob = await put(`rakesh-photo/${filename}`, req, {
       access: "public",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      token: TOKEN,
     });
-
-    // Update imageUrl in portfolio data (optional - non-fatal)
-    try {
-      const db = await getDb();
-      await db.collection("data").updateOne(
-        { id: "portfolio" },
-        { $set: { "hero.imageUrl": blob.url, id: "portfolio" } },
-        { upsert: true }
-      );
-    } catch (_) {}
 
     return res.status(200).json({ url: blob.url });
   } catch (e) {

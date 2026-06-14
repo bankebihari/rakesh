@@ -1,20 +1,20 @@
-import { MongoClient } from "mongodb";
-import dns from "dns";
-dns.setDefaultResultOrder("ipv4first");
+import { list, put } from "@vercel/blob";
 
-const uri = process.env.MONGODB_URI;
-let cachedClient = null;
-
-async function getDb() {
-  if (cachedClient) return cachedClient.db("rakesh");
-  const client = new MongoClient(uri);
-  await client.connect();
-  cachedClient = client;
-  return client.db("rakesh");
-}
-
+const TOKEN        = process.env.BLOB_READ_WRITE_TOKEN;
+const KEY          = "portfolio-data/admin.json";
 const DEFAULT_ID   = "rakesh2025";
 const DEFAULT_PASS = "Bablu@1234";
+
+async function getCreds() {
+  try {
+    const { blobs } = await list({ prefix: "portfolio-data/admin", token: TOKEN });
+    if (!blobs.length) return { id: DEFAULT_ID, password: DEFAULT_PASS };
+    const r = await fetch(blobs[0].url);
+    return r.ok ? r.json() : { id: DEFAULT_ID, password: DEFAULT_PASS };
+  } catch {
+    return { id: DEFAULT_ID, password: DEFAULT_PASS };
+  }
+}
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -26,14 +26,9 @@ export default async function handler(req, res) {
 
   try {
     const { id, password, action, newId, newPass } = req.body || {};
+    const creds = await getCreds();
 
-    const db  = await getDb();
-    const doc = await db.collection("config").findOne({ _id: "admin" });
-
-    const storedId   = doc?.id       || DEFAULT_ID;
-    const storedPass = doc?.password || DEFAULT_PASS;
-
-    if (id !== storedId || password !== storedPass) {
+    if (id !== creds.id || password !== creds.password) {
       return res.status(401).json({ ok: false, error: "Invalid ID or password." });
     }
 
@@ -41,11 +36,12 @@ export default async function handler(req, res) {
       if (!newId?.trim() || !newPass?.trim()) {
         return res.status(400).json({ ok: false, error: "New ID and password required." });
       }
-      await db.collection("config").updateOne(
-        { _id: "admin" },
-        { $set: { id: newId.trim(), password: newPass.trim() } },
-        { upsert: true }
-      );
+      await put(KEY, JSON.stringify({ id: newId.trim(), password: newPass.trim() }), {
+        access: "public",
+        addRandomSuffix: false,
+        token: TOKEN,
+        contentType: "application/json",
+      });
       return res.status(200).json({ ok: true, message: "Credentials updated." });
     }
 

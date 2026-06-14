@@ -1,16 +1,22 @@
-import { MongoClient } from "mongodb";
-import dns from "dns";
-dns.setDefaultResultOrder("ipv4first");
+import { put, list } from "@vercel/blob";
 
-const uri = process.env.MONGODB_URI;
-let cachedClient = null;
+const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+const KEY   = "portfolio-data/main.json";
 
-async function getDb() {
-  if (cachedClient) return cachedClient.db("rakesh");
-  const client = new MongoClient(uri);
-  await client.connect();
-  cachedClient = client;
-  return client.db("rakesh");
+async function readData() {
+  const { blobs } = await list({ prefix: "portfolio-data/main", token: TOKEN });
+  if (!blobs.length) return null;
+  const res = await fetch(blobs[0].url);
+  return res.ok ? res.json() : null;
+}
+
+async function writeData(data) {
+  await put(KEY, JSON.stringify(data), {
+    access: "public",
+    addRandomSuffix: false,
+    token: TOKEN,
+    contentType: "application/json",
+  });
 }
 
 export default async function handler(req, res) {
@@ -21,20 +27,14 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
   try {
-    const db  = await getDb();
-    const col = db.collection("data");
-
     if (req.method === "GET") {
-      const doc = await col.findOne({ id: "portfolio" });
-      return res.status(200).json(doc || null);
+      const data = await readData();
+      return res.status(200).json(data || null);
     }
 
     if (req.method === "POST") {
-      await col.updateOne(
-        { id: "portfolio" },
-        { $set: { ...req.body, id: "portfolio" } },
-        { upsert: true }
-      );
+      const existing = await readData() || {};
+      await writeData({ ...existing, ...req.body });
       return res.status(200).json({ ok: true });
     }
 

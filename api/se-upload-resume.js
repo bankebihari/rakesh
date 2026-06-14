@@ -1,17 +1,13 @@
-import { put, del } from "@vercel/blob";
-import { MongoClient } from "mongodb";
-import dns from "dns";
-dns.setDefaultResultOrder("ipv4first");
+import { put, del, list } from "@vercel/blob";
 
-const uri = process.env.MONGODB_URI;
-let cachedClient = null;
+const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+const DATA_KEY = "portfolio-data/main.json";
 
-async function getDb() {
-  if (cachedClient) return cachedClient.db("rakesh");
-  const client = new MongoClient(uri);
-  await client.connect();
-  cachedClient = client;
-  return client.db("rakesh");
+async function readData() {
+  const { blobs } = await list({ prefix: "portfolio-data/main", token: TOKEN });
+  if (!blobs.length) return {};
+  const r = await fetch(blobs[0].url);
+  return r.ok ? r.json() : {};
 }
 
 export const config = { api: { bodyParser: false } };
@@ -26,36 +22,41 @@ export default async function handler(req, res) {
   try {
     if (req.method === "PUT") {
       const filename = req.headers["x-filename"] || "resume.pdf";
-      const blob     = await put(`rakesh-resume/${filename}`, req, {
+      const blob = await put(`rakesh-resume/${filename}`, req, {
         access: "public",
-        token: process.env.BLOB_READ_WRITE_TOKEN,
+        token: TOKEN,
       });
-      const db   = await getDb();
-      const meta = {
-        name: filename, url: blob.url,
-        size: req.headers["content-length"]
-          ? parseInt(req.headers["content-length"]) > 1048576
-            ? (parseInt(req.headers["content-length"]) / 1048576).toFixed(2) + " MB"
-            : (parseInt(req.headers["content-length"]) / 1024).toFixed(1) + " KB"
-          : "—",
-        uploadedAt: new Date().toLocaleDateString(),
-      };
-      await db.collection("data").updateOne(
-        { id: "portfolio" },
-        { $set: { resume: meta, id: "portfolio" } },
-        { upsert: true }
-      );
+
+      const cl   = req.headers["content-length"];
+      const size = cl
+        ? parseInt(cl) > 1048576
+          ? (parseInt(cl) / 1048576).toFixed(2) + " MB"
+          : (parseInt(cl) / 1024).toFixed(1) + " KB"
+        : "—";
+
+      const meta = { name: filename, url: blob.url, size, uploadedAt: new Date().toLocaleDateString() };
+      const existing = await readData();
+      await put(DATA_KEY, JSON.stringify({ ...existing, resume: meta }), {
+        access: "public",
+        addRandomSuffix: false,
+        token: TOKEN,
+        contentType: "application/json",
+      });
+
       return res.status(200).json({ url: blob.url });
     }
 
     if (req.method === "DELETE") {
       const { url } = req.body || {};
-      if (url) await del(url, { token: process.env.BLOB_READ_WRITE_TOKEN });
-      const db = await getDb();
-      await db.collection("data").updateOne(
-        { id: "portfolio" },
-        { $unset: { resume: "" } }
-      );
+      if (url) await del(url, { token: TOKEN });
+      const existing = await readData();
+      delete existing.resume;
+      await put(DATA_KEY, JSON.stringify(existing), {
+        access: "public",
+        addRandomSuffix: false,
+        token: TOKEN,
+        contentType: "application/json",
+      });
       return res.status(200).json({ ok: true });
     }
 
