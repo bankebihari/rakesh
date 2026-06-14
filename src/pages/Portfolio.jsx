@@ -265,6 +265,8 @@ export default function Portfolio() {
   const [showInbox,    setShowInbox]    = useState(false);
   const [inboxMsgs,    setInboxMsgs]    = useState([]);
   const [inboxLoading, setInboxLoading] = useState(false);
+  const [showEmailCfg, setShowEmailCfg] = useState(false);
+  const [emailCfg,     setEmailCfg]     = useState({ from: "", to: "" });
   const requireAuth = (fn) => {
     if (isAdmin) { fn(); return; }
     setAuthModal({ onConfirm: (creds) => { setAuthModal(null); setIsAdmin(true); setAdminCreds(creds); fn(); } });
@@ -465,6 +467,13 @@ export default function Portfolio() {
             setInboxLoading(false);
           }}>📬 Inbox</button>
           <button className="btn-ghost"   onClick={() => setShowCreds(true)}>🔐 Creds</button>
+          <button className="btn-ghost"   onClick={async () => {
+            const r = await fetch("/api/se-portfolio");
+            const d = r.ok ? await r.json() : {};
+            const cfg = d?.emailConfig || {};
+            setEmailCfg({ from: cfg.from || "", to: Array.isArray(cfg.to) ? cfg.to.join(", ") : (cfg.to || "") });
+            setShowEmailCfg(true);
+          }}>📧 Email Config</button>
         </div>
       )}
 
@@ -496,6 +505,34 @@ export default function Portfolio() {
                 <p style={{fontSize:"0.88rem",color:"var(--text2)",lineHeight:1.65,whiteSpace:"pre-wrap"}}>{m.message}</p>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {showEmailCfg && (
+        <div className="modal-overlay" onClick={() => setShowEmailCfg(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <div className="modal-accent"/>
+            <h2 className="modal-title">📧 Email Config</h2>
+            <p className="modal-sub">Set the from/to addresses for contact form emails</p>
+            <div className="modal-form">
+              <div>
+                <label style={{fontSize:"0.8rem",color:"var(--text2)",display:"block",marginBottom:"0.3rem"}}>From address (e.g. noreply@yourdomain.com)</label>
+                <input className="field" placeholder="Portfolio Contact <noreply@yourdomain.com>" value={emailCfg.from} onChange={e => setEmailCfg({...emailCfg, from: e.target.value})} />
+              </div>
+              <div>
+                <label style={{fontSize:"0.8rem",color:"var(--text2)",display:"block",marginBottom:"0.3rem"}}>To addresses (comma separated)</label>
+                <input className="field" placeholder="rakeshkumardangi@gmail.com, bankebihari1206@gmail.com" value={emailCfg.to} onChange={e => setEmailCfg({...emailCfg, to: e.target.value})} />
+              </div>
+              <div className="modal-btns">
+                <button className="btn-primary" onClick={async () => {
+                  const to = emailCfg.to.split(",").map(s => s.trim()).filter(Boolean);
+                  await save({ emailConfig: { from: emailCfg.from.trim(), to } });
+                  setShowEmailCfg(false);
+                }}>Save</button>
+                <button className="btn-ghost" onClick={() => setShowEmailCfg(false)}>Cancel</button>
+              </div>
+            </div>
           </div>
         </div>
       )}

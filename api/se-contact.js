@@ -1,8 +1,12 @@
 import { put, list } from "@vercel/blob";
 import { Resend } from "resend";
 
-const TOKEN   = process.env.BLOB_READ_WRITE_TOKEN;
-const MSG_KEY = "portfolio-data/messages.json";
+const TOKEN    = process.env.BLOB_READ_WRITE_TOKEN;
+const MSG_KEY  = "portfolio-data/messages.json";
+const DATA_KEY = "portfolio-data/main.json";
+
+const DEFAULT_FROM    = "Portfolio Contact <onboarding@resend.dev>";
+const DEFAULT_TO      = ["banke741852@gmail.com"];
 
 async function readMessages() {
   const { blobs } = await list({ prefix: "portfolio-data/messages", token: TOKEN });
@@ -17,6 +21,16 @@ async function saveMessages(msgs) {
     allowOverwrite: true, token: TOKEN,
     contentType: "application/json",
   });
+}
+
+async function readEmailConfig() {
+  try {
+    const { blobs } = await list({ prefix: "portfolio-data/main", token: TOKEN });
+    if (!blobs.length) return {};
+    const r = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: "no-store" });
+    const data = r.ok ? await r.json() : {};
+    return data.emailConfig || {};
+  } catch { return {}; }
 }
 
 export default async function handler(req, res) {
@@ -43,7 +57,11 @@ export default async function handler(req, res) {
       console.error("Blob save error (non-fatal):", dbErr.message);
     }
 
-    // 2. Send email via Resend to both recipients
+    // 2. Read email config from DB
+    const cfg  = await readEmailConfig();
+    const from = cfg.from || DEFAULT_FROM;
+    const to   = cfg.to   || DEFAULT_TO;
+
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const emailHtml = `
@@ -66,8 +84,7 @@ export default async function handler(req, res) {
     `;
 
     const result = await resend.emails.send({
-      from: "Portfolio Contact <onboarding@resend.dev>",
-      to: ["banke741852@gmail.com"],
+      from, to,
       reply_to: email,
       subject: subject ? `Portfolio: ${subject}` : `New message from ${name}`,
       html: emailHtml,
