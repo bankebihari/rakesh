@@ -2,28 +2,28 @@
    TOKENS
 ══════════════════════════════════════════════ */
 :root {
-  --bg:      #0c0c0c;
-  --bg2:     #111111;
-  --bg3:     #181818;
-  --card:    #1a1a1a;
-  --card2:   #202020;
-  --border:  #2a2a2a;
-  --border2: #333333;
+  --bg:      #0d1117;
+  --bg2:     #161b22;
+  --bg3:     #1c2230;
+  --card:    #1e2a3a;
+  --card2:   #243044;
+  --border:  #2d3f55;
+  --border2: #3a5068;
 
-  --accent:  #f59e0b;
-  --accent2: #fbbf24;
-  --accent3: #d97706;
-  --accentbg: rgba(245,158,11,0.1);
-  --accentborder: rgba(245,158,11,0.25);
+  --accent:  #38bdf8;
+  --accent2: #7dd3fc;
+  --accent3: #0ea5e9;
+  --accentbg: rgba(56,189,248,0.1);
+  --accentborder: rgba(56,189,248,0.25);
 
-  --text:    #f5f5f5;
-  --text2:   #a1a1aa;
-  --text3:   #52525b;
+  --text:    #e6edf3;
+  --text2:   #8b9ab0;
+  --text3:   #4a5568;
 
-  --red:     #ef4444;
-  --green:   #22c55e;
+  --red:     #f87171;
+  --green:   #34d399;
   --radius:  10px;
-  --shadow:  0 8px 32px rgba(0,0,0,0.5);
+  --shadow:  0 8px 32px rgba(0,0,0,0.6);
 }
 
 .pf { background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -295,6 +295,8 @@
   line-height: 1.1; margin-bottom: 1.25rem;
   letter-spacing: -0.02em;
 }
+.hero-first { color: var(--text); }
+.hero-last  { color: var(--accent); }
 .hero-heading-role {
   color: var(--accent);
   font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 600;

@@ -6,7 +6,8 @@ import "./Portfolio.css";
 ───────────────────────────────────────── */
 const DEFAULT_HERO = {
   badge: "Open to New Opportunities",
-  name: "Rakesh",
+  firstName: "Rakesh",
+  lastName: "Kumar",
   role: "Civil Engineer",
   bio: "Civil Engineer with hands-on experience in AutoCAD designing, Advanced BIM Modeling (Revit Architecture & Structure), and Site Supervision. Seeking a challenging platform to contribute skills and drive company growth.",
   imageUrl: "/rakesh.jpg",
@@ -142,8 +143,11 @@ function HeroEditModal({ hero, onSave, onCancel, adminId, adminPass }) {
         <div className="modal-accent" />
         <h3 className="modal-title">Edit Profile</h3>
         <div className="modal-grid">
-          <input className="field" placeholder="Badge text"       value={form.badge}        onChange={f("badge")} />
-          <input className="field" placeholder="Name"             value={form.name}         onChange={f("name")} />
+          <input className="field" placeholder="Badge text"        value={form.badge}        onChange={f("badge")} />
+          <div style={{ display:"flex", gap:"0.5rem" }}>
+            <input className="field" placeholder="First Name"     value={form.firstName||""} onChange={f("firstName")} style={{ flex:1 }} />
+            <input className="field" placeholder="Last Name"      value={form.lastName||""}  onChange={f("lastName")}  style={{ flex:1 }} />
+          </div>
           <input className="field" placeholder="Role / Title"     value={form.role}         onChange={f("role")} />
           <textarea className="field field-area" placeholder="Bio" value={form.bio}         onChange={f("bio")} />
 
@@ -396,7 +400,11 @@ export default function Portfolio() {
   useEffect(() => {
     fetch("/api/se-portfolio").then((r) => r.ok ? r.json() : null).then((d) => {
       if (!d) return;
-      if (d.hero)                setHero((p) => ({ ...p, ...d.hero }));
+      if (d.hero) {
+        const h = { ...d.hero };
+        if (h.name && !h.firstName) { const parts = h.name.split(" "); h.firstName = parts[0]; h.lastName = parts.slice(1).join(" ") || ""; delete h.name; }
+        setHero((p) => ({ ...p, ...h }));
+      }
       if (d.skills)              setSkills((p) => ({ ...p, ...d.skills }));
       if (d.services?.length)    setServices(d.services);
       if (d.experiences?.length) setExperiences(d.experiences);
@@ -455,7 +463,7 @@ export default function Portfolio() {
           <span className="toast-emoji">👋</span>
           <div>
             <p className="toast-title">Welcome!</p>
-            <p className="toast-sub">Thanks for visiting {hero.name}&apos;s portfolio</p>
+            <p className="toast-sub">Thanks for visiting {hero.firstName} {hero.lastName}&apos;s portfolio</p>
           </div>
           <button className="toast-close" onClick={() => setShowToast(false)}>✕</button>
         </div>
@@ -466,7 +474,7 @@ export default function Portfolio() {
         <div className="nav-inner">
           <a href="#home" className="nav-logo">
             <span className="nav-logo-box">RK</span>
-            <span className="nav-logo-name">{hero.name}</span>
+            <span className="nav-logo-name">{hero.firstName} {hero.lastName}</span>
           </a>
           <ul className="nav-links">
             {navLinks.map((l) => (
@@ -490,7 +498,7 @@ export default function Portfolio() {
           <div className="hero-left">
             <div className="hero-tag">{hero.badge}</div>
             <h1 className="hero-heading">
-              {hero.name}<br />
+              <span className="hero-first">{hero.firstName}</span> <span className="hero-last">{hero.lastName}</span><br />
               <span className="hero-heading-role">{hero.role}</span>
             </h1>
             <p className="hero-bio">{hero.bio}</p>
@@ -516,7 +524,7 @@ export default function Portfolio() {
           <div className="hero-right">
             <div className="hero-img-frame" style={{ position: "relative" }}>
               <div className="hero-img-border" />
-              <img src={hero.imageUrl} alt={hero.name} className="hero-img" style={isAdmin ? { opacity: photoUploading ? 0.5 : 1 } : {}} />
+              <img src={hero.imageUrl} alt={`${hero.firstName} ${hero.lastName}`} className="hero-img" style={isAdmin ? { opacity: photoUploading ? 0.5 : 1 } : {}} />
               {isAdmin && (
                 <>
                   <div
@@ -898,7 +906,7 @@ export default function Portfolio() {
             <div className="footer-brand">
               <div className="nav-logo-box">RK</div>
               <div>
-                <p className="footer-name">{hero.name}</p>
+                <p className="footer-name">{hero.firstName} {hero.lastName}</p>
                 <p className="footer-role">{hero.role}</p>
               </div>
             </div>
