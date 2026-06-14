@@ -231,8 +231,31 @@ export default function Portfolio() {
   useEffect(() => { const t = setTimeout(() => setShowToast(false), 4000); return () => clearTimeout(t); }, []);
 
   /* ── Admin ── */
-  const [isAdmin,    setIsAdmin]    = useState(false);
-  const [adminCreds, setAdminCreds] = useState({ id: "", pass: "" });
+  const [isAdmin,        setIsAdmin]        = useState(false);
+  const [adminCreds,     setAdminCreds]     = useState({ id: "", pass: "" });
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const photoFileRef = useRef(null);
+
+  const handleHeroPhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoUploading(true);
+    try {
+      const res  = await fetch("/api/se-upload-photo", {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+          "x-filename":   file.name,
+          "x-admin-id":   adminCreds.id,
+          "x-admin-pass": adminCreds.pass,
+        },
+        body: file,
+      });
+      const data = await res.json();
+      if (data.url) setHero((p) => ({ ...p, imageUrl: data.url }));
+    } catch (err) { console.error(err); }
+    finally { setPhotoUploading(false); }
+  };
   const [authModal,  setAuthModal]  = useState(null);
   const [showCreds,  setShowCreds]  = useState(false);
   const requireAuth = (fn) => {
@@ -491,9 +514,30 @@ export default function Portfolio() {
             </div>
           </div>
           <div className="hero-right">
-            <div className="hero-img-frame">
+            <div className="hero-img-frame" style={{ position: "relative" }}>
               <div className="hero-img-border" />
-              <img src={hero.imageUrl} alt={hero.name} className="hero-img" />
+              <img src={hero.imageUrl} alt={hero.name} className="hero-img" style={isAdmin ? { opacity: photoUploading ? 0.5 : 1 } : {}} />
+              {isAdmin && (
+                <>
+                  <div
+                    onClick={() => !photoUploading && photoFileRef.current?.click()}
+                    style={{
+                      position: "absolute", inset: 0, borderRadius: "50%",
+                      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                      background: "rgba(0,0,0,0.45)", cursor: "pointer", opacity: 0, transition: "opacity 0.2s",
+                      zIndex: 2,
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = 0}
+                  >
+                    <span style={{ fontSize: "1.6rem" }}>📷</span>
+                    <span style={{ color: "#fff", fontSize: "0.75rem", fontWeight: 600, marginTop: 4 }}>
+                      {photoUploading ? "Uploading…" : "Change Photo"}
+                    </span>
+                  </div>
+                  <input ref={photoFileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleHeroPhotoUpload} />
+                </>
+              )}
               <div className="hero-img-tag">Civil Engineer</div>
             </div>
           </div>
