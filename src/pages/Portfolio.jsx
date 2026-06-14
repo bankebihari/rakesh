@@ -78,7 +78,7 @@ function AuthModal({ onConfirm, onCancel }) {
     try {
       const res  = await fetch("/api/se-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: uid, password: pwd }) });
       const data = await res.json();
-      if (data.ok) onConfirm();
+      if (data.ok) onConfirm({ id: uid, pass: pwd });
       else { setErr(data.error || "Invalid credentials."); setUid(""); setPwd(""); }
     } catch { setErr("Connection error."); }
     finally { setLoading(false); }
@@ -107,9 +107,35 @@ function AuthModal({ onConfirm, onCancel }) {
 /* ─────────────────────────────────────────
    HERO EDIT MODAL
 ───────────────────────────────────────── */
-function HeroEditModal({ hero, onSave, onCancel }) {
-  const [form, setForm] = useState({ ...hero });
+function HeroEditModal({ hero, onSave, onCancel, adminId, adminPass }) {
+  const [form, setForm]           = useState({ ...hero });
+  const [uploading, setUploading] = useState(false);
+  const [uploadErr, setUploadErr] = useState("");
+  const fileRef                   = useRef(null);
   const f = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true); setUploadErr("");
+    try {
+      const res  = await fetch("/api/se-upload-photo", {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+          "x-filename":   file.name,
+          "x-admin-id":   adminId,
+          "x-admin-pass": adminPass,
+        },
+        body: file,
+      });
+      const data = await res.json();
+      if (data.url) setForm((p) => ({ ...p, imageUrl: data.url }));
+      else setUploadErr(data.error || "Upload failed.");
+    } catch { setUploadErr("Upload error."); }
+    finally { setUploading(false); }
+  };
+
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal-box wide" onClick={(e) => e.stopPropagation()}>
@@ -120,7 +146,26 @@ function HeroEditModal({ hero, onSave, onCancel }) {
           <input className="field" placeholder="Name"             value={form.name}         onChange={f("name")} />
           <input className="field" placeholder="Role / Title"     value={form.role}         onChange={f("role")} />
           <textarea className="field field-area" placeholder="Bio" value={form.bio}         onChange={f("bio")} />
-          <input className="field" placeholder="Profile Image URL" value={form.imageUrl}    onChange={f("imageUrl")} />
+
+          {/* Photo upload */}
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <input className="field" placeholder="Profile Image URL" value={form.imageUrl} onChange={f("imageUrl")} style={{ flex: 1 }} />
+            <button
+              type="button"
+              className="btn-ghost"
+              style={{ whiteSpace: "nowrap", padding: "0.5rem 1rem" }}
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? "Uploading…" : "📷 Upload"}
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhotoUpload} />
+          </div>
+          {uploadErr && <p className="field-error">{uploadErr}</p>}
+          {form.imageUrl && (
+            <img src={form.imageUrl} alt="Preview" style={{ width: 80, height: 80, objectFit: "cover", borderRadius: "50%", border: "2px solid var(--accent)" }} />
+          )}
+
           <input className="field" placeholder="LinkedIn URL"     value={form.linkedinUrl}  onChange={f("linkedinUrl")} />
           <input className="field" placeholder="Email"            value={form.contactEmail} onChange={f("contactEmail")} />
           <input className="field" placeholder="Location"         value={form.location}     onChange={f("location")} />
@@ -186,12 +231,13 @@ export default function Portfolio() {
   useEffect(() => { const t = setTimeout(() => setShowToast(false), 4000); return () => clearTimeout(t); }, []);
 
   /* ── Admin ── */
-  const [isAdmin,   setIsAdmin]   = useState(false);
-  const [authModal, setAuthModal] = useState(null);
-  const [showCreds, setShowCreds] = useState(false);
+  const [isAdmin,    setIsAdmin]    = useState(false);
+  const [adminCreds, setAdminCreds] = useState({ id: "", pass: "" });
+  const [authModal,  setAuthModal]  = useState(null);
+  const [showCreds,  setShowCreds]  = useState(false);
   const requireAuth = (fn) => {
     if (isAdmin) { fn(); return; }
-    setAuthModal({ onConfirm: () => { setAuthModal(null); setIsAdmin(true); fn(); } });
+    setAuthModal({ onConfirm: (creds) => { setAuthModal(null); setIsAdmin(true); setAdminCreds(creds); fn(); } });
   };
 
   /* ── DB ── */
@@ -369,7 +415,7 @@ export default function Portfolio() {
 
       {/* Modals */}
       {authModal    && <AuthModal     onConfirm={authModal.onConfirm} onCancel={() => setAuthModal(null)} />}
-      {editingHero  && <HeroEditModal hero={hero} onSave={saveHero}   onCancel={() => setEditingHero(false)} />}
+      {editingHero  && <HeroEditModal hero={hero} onSave={saveHero}   onCancel={() => setEditingHero(false)} adminId={adminCreds.id} adminPass={adminCreds.pass} />}
       {showCreds    && <CredsModal    onClose={() => setShowCreds(false)} />}
 
       {/* Admin Fab */}
