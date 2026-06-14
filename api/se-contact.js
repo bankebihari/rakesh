@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 const uri = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -34,21 +34,13 @@ export default async function handler(req, res) {
       receivedAt: new Date(),
     });
 
-    // 2. Send email to Rakesh
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    // 2. Send email to Rakesh via Resend
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-    await transporter.sendMail({
-      from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: "Portfolio Contact <onboarding@resend.dev>",
       to: "rakeshkumardangi@gmail.com",
-      replyTo: email,
+      reply_to: email,
       subject: subject ? `Portfolio: ${subject}` : `New message from ${name}`,
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#f9f9f9;border-radius:8px;overflow:hidden;">
