@@ -5,7 +5,7 @@ import "./Portfolio.css";
    DEFAULTS
 ───────────────────────────────────────── */
 const DEFAULT_HERO = {
-  badge: "Open to New Opportunities",
+  badge: "🏗️ Civil Engineer · Site Incharge",
   firstName: "Rakesh",
   lastName: "Kumar",
   role: "Civil Engineer",
@@ -382,7 +382,7 @@ export default function Portfolio() {
   const savePhone = () => { const v = phoneVal.trim(); if (v) { setPhone(v); save({ phone: v }); } setEditPhone(false); };
 
   /* ── Contact ── */
-  const [cf, setCf]           = useState({ name: "", email: "", subject: "", message: "" });
+  const [cf, setCf]           = useState({ name: "", email: "", phone: "", subject: "", message: "" });
   const [sent, setSent]       = useState(false);
   const [sending, setSending] = useState(false);
   const [cfErr, setCfErr]     = useState("");
@@ -391,7 +391,7 @@ export default function Portfolio() {
     try {
       const res = await fetch("/api/se-contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cf) });
       if (!res.ok) throw new Error();
-      setCf({ name: "", email: "", subject: "", message: "" }); setSent(true); setTimeout(() => setSent(false), 4000);
+      setCf({ name: "", email: "", phone: "", subject: "", message: "" }); setSent(true); setTimeout(() => setSent(false), 4000);
     } catch { setCfErr("Failed to send. Please try again."); }
     setSending(false);
   };
@@ -563,7 +563,7 @@ export default function Portfolio() {
       </section>
 
       {/* ══ SERVICES ══ */}
-      <section id="services" className="section dark-section">
+      <section id="services" className="section services-section">
         <div className="container">
           <div className="sec-head">
             <span className="sec-tag">What I Do</span>
@@ -662,7 +662,7 @@ export default function Portfolio() {
       </section>
 
       {/* ══ PROJECTS ══ */}
-      <section id="projects" className="section dark-section">
+      <section id="projects" className="section projects-section">
         <div className="container">
           <div className="sec-head">
             <span className="sec-tag">Portfolio</span>
@@ -850,20 +850,27 @@ export default function Portfolio() {
                     <p className="contact-item-val">{hero.contactEmail}</p>
                   </div>
                 </a>
-                <div className="contact-item" onClick={() => requireAuth(() => { setPhoneVal(phone); setEditPhone(true); setTimeout(() => phoneRef.current?.focus(), 50); })}>
-                  <div className="contact-item-icon">📞</div>
-                  <div>
-                    <p className="contact-item-label">Phone</p>
-                    {editPhone ? (
+                {editPhone ? (
+                  <div className="contact-item">
+                    <div className="contact-item-icon">📞</div>
+                    <div>
+                      <p className="contact-item-label">Phone</p>
                       <input ref={phoneRef} className="field inline-phone" value={phoneVal}
                         onChange={(e) => setPhoneVal(e.target.value)}
                         onBlur={savePhone}
                         onKeyDown={(e) => { if (e.key === "Enter") savePhone(); if (e.key === "Escape") setEditPhone(false); }} />
-                    ) : (
-                      <p className="contact-item-val">{phone} <span className="edit-hint">✎</span></p>
-                    )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <a href={`tel:${phone.replace(/\s/g,"")}`} className="contact-item"
+                    onClick={(e) => { if (isAdmin) { e.preventDefault(); requireAuth(() => { setPhoneVal(phone); setEditPhone(true); setTimeout(() => phoneRef.current?.focus(), 50); }); } }}>
+                    <div className="contact-item-icon">📞</div>
+                    <div>
+                      <p className="contact-item-label">Phone</p>
+                      <p className="contact-item-val">{phone}{isAdmin && <span className="edit-hint"> ✎</span>}</p>
+                    </div>
+                  </a>
+                )}
                 <div className="contact-item">
                   <div className="contact-item-icon">📍</div>
                   <div>
@@ -888,7 +895,10 @@ export default function Portfolio() {
                 <input className="field" placeholder="Your Name *"  required value={cf.name}    onChange={(e) => setCf({ ...cf, name: e.target.value })} />
                 <input className="field" type="email" placeholder="Your Email *" required value={cf.email} onChange={(e) => setCf({ ...cf, email: e.target.value })} />
               </div>
-              <input    className="field" placeholder="Subject"     value={cf.subject}  onChange={(e) => setCf({ ...cf, subject: e.target.value })} />
+              <div className="form-2col">
+                <input className="field" type="tel" placeholder="Phone Number" value={cf.phone} onChange={(e) => setCf({ ...cf, phone: e.target.value })} />
+                <input className="field" placeholder="Subject" value={cf.subject} onChange={(e) => setCf({ ...cf, subject: e.target.value })} />
+              </div>
               <textarea className="field field-area contact-area"   placeholder="Your message…" required value={cf.message} onChange={(e) => setCf({ ...cf, message: e.target.value })} />
               {cfErr && <p className="field-error">{cfErr}</p>}
               <button type="submit" className="btn-primary full">
@@ -902,25 +912,14 @@ export default function Portfolio() {
       {/* ══ FOOTER ══ */}
       <footer className="footer">
         <div className="container">
-          <div className="footer-top">
-            <div className="footer-brand">
-              <div className="nav-logo-box">RK</div>
-              <div>
-                <p className="footer-name">{hero.firstName} {hero.lastName}</p>
-                <p className="footer-role">{hero.role}</p>
-              </div>
-            </div>
-            <div className="footer-links">
-              {navLinks.map((l) => <a key={l.id} href={`#${l.id}`} className="footer-link">{l.label}</a>)}
-            </div>
-          </div>
           <div className="footer-bottom">
             <p dangerouslySetInnerHTML={{ __html: hero.footerText.replace("♥", '<span class="heart">♥</span>') }} />
             <div className="footer-dev">
-              <span className="footer-dev-title">© Built by Banke Bihari · Want a portfolio like this? Contact us</span>
+              <span className="footer-dev-title">🖥️ Designed & Developed by Banke Bihari · Web & Software Development Services</span>
               <div className="footer-dev-contacts">
                 <a href="mailto:bankebihari1206@gmail.com">📧 bankebihari1206@gmail.com</a>
                 <a href="tel:+916200957173">📞 6200957173</a>
+                <a href="https://github.com/bankebihari" target="_blank" rel="noreferrer">🐙 github.com/bankebihari</a>
               </div>
             </div>
           </div>
