@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   try {
     const { blobs } = await list({ prefix: "portfolio-data/main", token: TOKEN });
     if (!blobs.length) return res.status(404).json({ error: "No resume" });
-    const r = await fetch(blobs[0].url);
+    const r = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: "no-store" });
     const data = r.ok ? await r.json() : null;
     if (data?.resume) return res.status(200).json(data.resume);
     return res.status(404).json({ error: "No resume" });

@@ -6,7 +6,7 @@ const DATA_KEY = "portfolio-data/main.json";
 async function readData() {
   const { blobs } = await list({ prefix: "portfolio-data/main", token: TOKEN });
   if (!blobs.length) return {};
-  const r = await fetch(blobs[0].url);
+  const r = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: "no-store" });
   return r.ok ? r.json() : {};
 }
 
