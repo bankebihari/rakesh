@@ -303,9 +303,10 @@
   max-width: 1140px; margin: 0 auto; padding: 5rem 1.5rem 3rem;
   display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
 }
+.hero-right { display: flex; justify-content: flex-end; }
 @media (max-width: 768px) {
   .hero-inner { grid-template-columns: 1fr; padding-top: 3rem; text-align: center; }
-  .hero-right { order: -1; display: flex; justify-content: center; }
+  .hero-right { order: -1; justify-content: center; }
   .hero-actions, .hero-socials { justify-content: center; }
 }
 

@@ -261,7 +261,10 @@ export default function Portfolio() {
     finally { setPhotoUploading(false); }
   };
   const [authModal,  setAuthModal]  = useState(null);
-  const [showCreds,  setShowCreds]  = useState(false);
+  const [showCreds,    setShowCreds]    = useState(false);
+  const [showInbox,    setShowInbox]    = useState(false);
+  const [inboxMsgs,    setInboxMsgs]    = useState([]);
+  const [inboxLoading, setInboxLoading] = useState(false);
   const requireAuth = (fn) => {
     if (isAdmin) { fn(); return; }
     setAuthModal({ onConfirm: (creds) => { setAuthModal(null); setIsAdmin(true); setAdminCreds(creds); fn(); } });
@@ -453,7 +456,47 @@ export default function Portfolio() {
       {isAdmin && (
         <div className="admin-fab">
           <button className="btn-primary" onClick={() => setEditingHero(true)}>✎ Edit</button>
-          <button className="btn-ghost"   onClick={() => setShowCreds(true)}>🔐 Login</button>
+          <button className="btn-ghost"   onClick={async () => {
+            setShowInbox(true); setInboxLoading(true);
+            try {
+              const r = await fetch("/api/se-messages", { headers: { "x-admin-id": adminCreds.id, "x-admin-pass": adminCreds.pass } });
+              setInboxMsgs(r.ok ? await r.json() : []);
+            } catch { setInboxMsgs([]); }
+            setInboxLoading(false);
+          }}>📬 Inbox</button>
+          <button className="btn-ghost"   onClick={() => setShowCreds(true)}>🔐 Creds</button>
+        </div>
+      )}
+
+      {showInbox && (
+        <div className="modal-overlay" onClick={() => setShowInbox(false)}>
+          <div className="modal-box wide" style={{maxWidth:"680px",maxHeight:"80vh",overflowY:"auto"}} onClick={e => e.stopPropagation()}>
+            <div className="modal-accent"/>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem"}}>
+              <h2 className="modal-title">📬 Message Inbox</h2>
+              <button className="btn-ghost-sm" onClick={() => setShowInbox(false)}>✕</button>
+            </div>
+            {inboxLoading ? (
+              <p style={{color:"var(--text2)",textAlign:"center",padding:"2rem"}}>Loading…</p>
+            ) : inboxMsgs.length === 0 ? (
+              <p style={{color:"var(--text2)",textAlign:"center",padding:"2rem"}}>No messages yet.</p>
+            ) : inboxMsgs.map((m, i) => (
+              <div key={i} style={{background:"var(--bg2)",border:"1px solid var(--border)",borderRadius:"10px",padding:"1rem 1.25rem",marginBottom:"0.75rem"}}>
+                <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:"0.5rem",marginBottom:"0.5rem"}}>
+                  <div>
+                    <strong style={{fontSize:"0.95rem"}}>{m.name}</strong>
+                    <span style={{color:"var(--text2)",fontSize:"0.82rem",marginLeft:"0.5rem"}}>
+                      <a href={`mailto:${m.email}`} style={{color:"var(--accent)"}}>{m.email}</a>
+                      {m.phone && <> · <a href={`tel:${m.phone}`} style={{color:"var(--accent)"}}>{m.phone}</a></>}
+                    </span>
+                  </div>
+                  <span style={{fontSize:"0.75rem",color:"var(--text3)"}}>{new Date(m.receivedAt).toLocaleString()}</span>
+                </div>
+                {m.subject && <p style={{fontSize:"0.82rem",fontWeight:700,color:"var(--accent)",marginBottom:"0.4rem"}}>{m.subject}</p>}
+                <p style={{fontSize:"0.88rem",color:"var(--text2)",lineHeight:1.65,whiteSpace:"pre-wrap"}}>{m.message}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
