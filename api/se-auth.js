@@ -1,23 +1,18 @@
 import { MongoClient } from "mongodb";
 
-const uri    = process.env.MONGODB_URI;
-const DB_NAME = "portfolio";
-
+const uri = process.env.MONGODB_URI;
 let cachedClient = null;
 
 async function getDb() {
-  if (cachedClient) return cachedClient.db(DB_NAME);
+  if (cachedClient) return cachedClient.db("rakesh");
   const client = new MongoClient(uri);
   await client.connect();
   cachedClient = client;
-  return client.db(DB_NAME);
+  return client.db("rakesh");
 }
 
-// Default credentials for the site engineer admin
-// Using a separate "se_config" collection so the developer portfolio's
-// "config" collection is never touched.
-const DEFAULT_ID   = "rakesh2024";
-const DEFAULT_PASS = "site@123456";
+const DEFAULT_ID   = "rakesh2025";
+const DEFAULT_PASS = "Bablu@1234";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -31,9 +26,9 @@ export default async function handler(req, res) {
     const { id, password, action, newId, newPass } = req.body || {};
 
     const db  = await getDb();
-    const doc = await db.collection("se_config").findOne({ _id: "se_admin" });
+    const doc = await db.collection("config").findOne({ _id: "admin" });
 
-    const storedId   = doc?.id   || DEFAULT_ID;
+    const storedId   = doc?.id       || DEFAULT_ID;
     const storedPass = doc?.password || DEFAULT_PASS;
 
     if (id !== storedId || password !== storedPass) {
@@ -44,8 +39,8 @@ export default async function handler(req, res) {
       if (!newId?.trim() || !newPass?.trim()) {
         return res.status(400).json({ ok: false, error: "New ID and password required." });
       }
-      await db.collection("se_config").updateOne(
-        { _id: "se_admin" },
+      await db.collection("config").updateOne(
+        { _id: "admin" },
         { $set: { id: newId.trim(), password: newPass.trim() } },
         { upsert: true }
       );

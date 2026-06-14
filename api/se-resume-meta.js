@@ -4,11 +4,11 @@ const uri = process.env.MONGODB_URI;
 let cachedClient = null;
 
 async function getDb() {
-  if (cachedClient) return cachedClient.db("portfolio");
+  if (cachedClient) return cachedClient.db("rakesh");
   const client = new MongoClient(uri);
   await client.connect();
   cachedClient = client;
-  return client.db("portfolio");
+  return client.db("rakesh");
 }
 
 export default async function handler(req, res) {
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
   try {
     const db  = await getDb();
-    const doc = await db.collection("se_data").findOne({ id: "se_portfolio" });
+    const doc = await db.collection("data").findOne({ id: "portfolio" });
     if (doc?.resume) return res.status(200).json(doc.resume);
     return res.status(404).json({ error: "No resume" });
   } catch (e) {

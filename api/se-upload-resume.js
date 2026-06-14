@@ -5,11 +5,11 @@ const uri = process.env.MONGODB_URI;
 let cachedClient = null;
 
 async function getDb() {
-  if (cachedClient) return cachedClient.db("portfolio");
+  if (cachedClient) return cachedClient.db("rakesh");
   const client = new MongoClient(uri);
   await client.connect();
   cachedClient = client;
-  return client.db("portfolio");
+  return client.db("rakesh");
 }
 
 export const config = { api: { bodyParser: false } };
@@ -24,11 +24,11 @@ export default async function handler(req, res) {
   try {
     if (req.method === "PUT") {
       const filename = req.headers["x-filename"] || "resume.pdf";
-      const blob     = await put(`se-resume/${filename}`, req, {
+      const blob     = await put(`rakesh-resume/${filename}`, req, {
         access: "public",
         token: process.env.BLOB_READ_WRITE_TOKEN,
       });
-      const db  = await getDb();
+      const db   = await getDb();
       const meta = {
         name: filename, url: blob.url,
         size: req.headers["content-length"]
@@ -38,9 +38,9 @@ export default async function handler(req, res) {
           : "—",
         uploadedAt: new Date().toLocaleDateString(),
       };
-      await db.collection("se_data").updateOne(
-        { id: "se_portfolio" },
-        { $set: { resume: meta, id: "se_portfolio" } },
+      await db.collection("data").updateOne(
+        { id: "portfolio" },
+        { $set: { resume: meta, id: "portfolio" } },
         { upsert: true }
       );
       return res.status(200).json({ url: blob.url });
@@ -50,8 +50,8 @@ export default async function handler(req, res) {
       const { url } = req.body || {};
       if (url) await del(url, { token: process.env.BLOB_READ_WRITE_TOKEN });
       const db = await getDb();
-      await db.collection("se_data").updateOne(
-        { id: "se_portfolio" },
+      await db.collection("data").updateOne(
+        { id: "portfolio" },
         { $unset: { resume: "" } }
       );
       return res.status(200).json({ ok: true });

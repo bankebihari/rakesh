@@ -4,11 +4,11 @@ const uri = process.env.MONGODB_URI;
 let cachedClient = null;
 
 async function getDb() {
-  if (cachedClient) return cachedClient.db("portfolio");
+  if (cachedClient) return cachedClient.db("rakesh");
   const client = new MongoClient(uri);
   await client.connect();
   cachedClient = client;
-  return client.db("portfolio");
+  return client.db("rakesh");
 }
 
 export default async function handler(req, res) {
@@ -20,20 +20,17 @@ export default async function handler(req, res) {
 
   try {
     const db  = await getDb();
-    // Using a separate collection "se_data" so the developer portfolio's
-    // "data" collection is never touched.
-    const col = db.collection("se_data");
+    const col = db.collection("data");
 
     if (req.method === "GET") {
-      const doc = await col.findOne({ id: "se_portfolio" });
+      const doc = await col.findOne({ id: "portfolio" });
       return res.status(200).json(doc || null);
     }
 
     if (req.method === "POST") {
-      const body = req.body;
       await col.updateOne(
-        { id: "se_portfolio" },
-        { $set: { ...body, id: "se_portfolio" } },
+        { id: "portfolio" },
+        { $set: { ...req.body, id: "portfolio" } },
         { upsert: true }
       );
       return res.status(200).json({ ok: true });
